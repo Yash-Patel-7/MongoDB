@@ -1,0 +1,168 @@
+db.bars.aggregate(
+[
+  {$match: {
+    $or: [
+    {
+      phone: "",
+    },
+    {
+      addr: "",
+    },
+    ],
+  }},
+  {$project: {
+	_id: 0,
+    name: 1,
+  }}
+]
+)
+
+
+
+db.bars.aggregate(
+[
+  {$group: {
+    _id: {
+      city: "$city"
+    },
+    num_of_bars: {
+      $count: {},
+    },
+  }},
+  {$match: {
+    num_of_bars: {$gt: 4},
+  }},
+  {$project: {
+    _id: 1,
+    num_of_bars: 1,
+  }}
+]
+)
+
+
+
+db.bars.aggregate(
+[
+  {$match: {
+      $expr: {
+        $gt: [
+          {
+            $size: "$beers"
+          },
+          5
+        ]
+      }
+  }},
+  {$group: {
+    _id: null,
+    num_of_bars: {
+      $count: {},
+    },
+  }},
+  {$project: {
+    _id: 0,
+    num_of_bars: 1,
+  }}
+]
+)
+
+
+
+db.drinkers.aggregate(
+[
+  {$match: {
+      $or: [
+    	{
+      	history: {
+        	$elemMatch: {
+          	day: "Saturday",
+        	}
+      	}
+    	},
+    	{
+      	history: {
+        	$elemMatch: {
+          	day: "Sunday",
+        	},
+      	}
+    	},
+  	],
+  }},
+  {$project: {
+    _id: 0,
+    name: 1
+  }}
+]
+)
+
+
+
+db.drinkers.aggregate(
+[
+  {
+    $unwind: {
+      path: "$history",
+    },
+  },
+  {
+    $unwind: {
+      path: "$history.set_of_beers",
+    },
+  },
+  {
+    $match: {
+      "history.set_of_beers": "Blue Tattoo",
+    },
+  },
+  {
+    $group: {
+      _id: "$_id",
+      name: {
+        $first: "$name",
+      },
+      counter: {
+        $count: {},
+      },
+    },
+  },
+  {
+    $match: {
+      counter: {
+        $gt: 1,
+      },
+    },
+  },
+  {
+    $project: {
+      name: 1,
+      _id: 0,
+    },
+  },
+]
+)
+
+
+
+db.drinkers.insertOne(
+{
+  "name": "Lucy",
+  "city": "Edison",
+  "phone": "732-571-9871",
+  "addr": "433 river Road",
+  "age": 23,
+  "favorite_foods": [
+    "French fries",
+    "Onion rings",
+    "Nachos",
+    "Wings"
+  ]
+}
+)
+
+
+
+[{   "AB": 11,   "CD": [00, 10]},
+ {   "AB": 01,   "CD": [10, 00, 11]}]
+Value Count: 14
+
+
